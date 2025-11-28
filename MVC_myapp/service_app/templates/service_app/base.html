@@ -1,0 +1,140 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Mail & Base64 Toolkit</title>
+    <style>
+        /* 🎨 Pro Design Variables and Global Styles */
+        :root {
+            --primary-color: #007bff; /* Standard Blue */
+            --primary-hover: #0056b3;
+            --background-color: #f8f9fa; /* Light grey for the entire body */
+            --card-background: #ffffff;
+            --text-color: #343a40;
+            --border-color: #dee2e6;
+            --shadow-light: 0 4px 12px rgba(0, 0, 0, 0.05);
+        }
+
+        /* Base Body and Container Reset/Update */
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            margin: 0;
+            padding: 0;
+            background-color: var(--background-color);
+            color: var(--text-color);
+        }
+
+        .container {
+            max-width: 1000px;
+            margin: 40px auto; /* Centered content with vertical space */
+            padding: 25px;
+            background-color: var(--card-background); /* White background for the main box */
+            border-radius: 10px;
+            box-shadow: 0 8px 20px rgba(0, 0, 0, 0.08); /* Overall container shadow */
+        }
+
+        h1 {
+            color: var(--primary-color);
+            padding-bottom: 10px;
+            border-bottom: 2px solid var(--border-color);
+            margin-bottom: 30px;
+            font-size: 2em;
+        }
+
+        /* Original styles (kept for reference, but likely overwritten or unused in this context) */
+        .tab { display: none; }
+        .tab.active { display: block; }
+        .form-group { margin: 10px 0; }
+        textarea, input { width: 100%; padding: 8px; border: 1px solid var(--border-color); border-radius: 4px; }
+
+        /* --- Navigation Bar (Tool Links) --- */
+        .tool-grid {
+            /* Renaming 'nav' to 'tool-grid' since the structure is for links, not primary site navigation */
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+            gap: 25px;
+            margin: 30px 0;
+            padding: 10px 0;
+        }
+
+        .tool-btn {
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            height: 120px; /* Taller card-like button */
+            padding: 15px;
+            background-color: var(--card-background);
+            color: var(--primary-color);
+            text-align: center;
+            text-decoration: none;
+            border-radius: 8px;
+            border: 1px solid var(--border-color);
+            font-size: 1.1em;
+            font-weight: 600;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05); /* Subtle shadow for 3D effect */
+            transition: transform 0.2s ease, box-shadow 0.2s ease, border-color 0.2s ease;
+        }
+
+        .tool-btn:hover {
+            color: white; /* Text turns white on hover */
+            background-color: var(--primary-hover);
+            border-color: var(--primary-hover);
+            transform: translateY(-3px);
+            box-shadow: 0 8px 20px rgba(0, 0, 0, 0.2);
+        }
+
+        .tool-btn-icon {
+            font-size: 2em;
+            margin-bottom: 5px;
+        }
+
+        /* Description Card Styling */
+        .description-card {
+            background-color: var(--background-color);
+            padding: 20px;
+            border-radius: 6px;
+            border-left: 5px solid var(--primary-color);
+            margin-top: 30px;
+            font-style: italic;
+            color: #6c757d;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>📧 Mail & Base64 Toolkit</h1>
+
+        {% block content %}
+
+        <h2>🚀 Select a Utility</h2>
+
+        <div class="tool-grid">
+            <a href="{% url 'smtp' %}" class="tool-btn">
+                <span class="tool-btn-icon">📤</span>
+                SMTP Sender
+            </a>
+            <a href="{% url 'pop3' %}" class="tool-btn">
+                <span class="tool-btn-icon">📥</span>
+                POP3 Client
+            </a>
+            <a href="{% url 'imap' %}" class="tool-btn">
+                <span class="tool-btn-icon">📦</span>
+                IMAP Client
+            </a>
+            <a href="{% url 'b64' %}" class="tool-btn">
+                <span class="tool-btn-icon">⚙️</span>
+                Base64 Tool
+            </a>
+        </div>
+
+        <div class="description-card">
+            <p>This centralized dashboard offers professional utilities for handling core email protocols (SMTP, POP3, IMAP) and essential data encoding/decoding using Base64.</p>
+            <p>Click on any tool above to get started with secure and efficient operations.</p>
+        </div>
+
+        {% endblock %}
+        </div>
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+    {% block scripts %}{% endblock %}
+</body>
+</html>

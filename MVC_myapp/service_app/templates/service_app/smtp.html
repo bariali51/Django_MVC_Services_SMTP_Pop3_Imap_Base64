@@ -1,0 +1,253 @@
+{% extends 'service_app/base.html' %}
+{% block content %}
+<div class="smtp-container">
+    <header class="smtp-header">
+        <i class="fas fa-envelope-open-text"></i>
+        <h2>SMTP Email Sender</h2>
+    </header>
+
+    <div class="smtp-card">
+        <form id="smtpForm" class="smtp-form">
+            <fieldset class="form-section">
+                <legend>Sender Credentials</legend>
+                <div class="form-group">
+                    <label for="sender">Sender Email</label>
+                    <input type="email" id="sender" placeholder="your.email@example.com" required>
+                </div>
+                <div class="form-group last-form-group">
+                    <label for="pwd">Password / App Password</label>
+                    <input type="password" id="pwd" placeholder="e.g., Google App Password" required>
+                </div>
+            </fieldset>
+
+            <fieldset class="form-section">
+                <legend>Message Details</legend>
+                <div class="form-group">
+                    <label for="receiver">Receiver Email</label>
+                    <input type="email" id="receiver" placeholder="recipient@example.com" required>
+                </div>
+                <div class="form-group">
+                    <label for="subject">Subject</label>
+                    <input type="text" id="subject" placeholder="Important Update Regarding..." maxlength="100">
+                </div>
+                <div class="form-group last-form-group">
+                    <label for="message">Message Body</label>
+                    <textarea id="message" rows="4" placeholder="Type your email content here..."></textarea>
+                </div>
+            </fieldset>
+
+            <div class="form-group file-upload-group last-form-group">
+                <label for="attachments">Attachments</label>
+                <input type="file" id="attachments" multiple aria-describedby="file-upload-help">
+                <small id="file-upload-help" class="text-muted">Max file size limit depends on server configuration.</small>
+            </div>
+
+            <button type="submit" class="btn-send">
+                <i class="fas fa-paper-plane"></i> Send Email
+            </button>
+        </form>
+
+        <div id="result" class="result-message" role="alert" aria-live="polite"></div>
+    </div>
+</div>
+
+<style>
+/* -------------------------------------- */
+/* CSS for Compact Professional Design - MINIMIZED BOTTOM MARGINS */
+/* -------------------------------------- */
+
+:root {
+    --primary-color: #007bff;
+    --secondary-color: #6c757d;
+}
+
+/* 1. Global/Container Styles - MINIMIZED */
+.smtp-container {
+    max-width: 500px;
+    margin: 10px auto; /* Reduced top/bottom margin */
+    padding: 5px; /* Reduced container padding */
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    padding-bottom: 0; /* Minimized bottom padding */
+}
+
+/* 2. Header Style - MINIMIZED */
+.smtp-header {
+    text-align: center;
+    margin-bottom: 10px; /* Reduced spacing below header */
+    color: var(--primary-color);
+}
+
+.smtp-header h2 {
+    margin: 8px 0 0;
+    font-size: 1.4em; /* Slightly smaller font */
+    font-weight: 600;
+}
+
+.smtp-header i {
+    font-size: 2.2em; /* Slightly smaller icon */
+    display: block;
+}
+
+/* 3. Card/Form Wrapper - MINIMIZED */
+.smtp-card {
+    background: #ffffff;
+    border-radius: 12px;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+    padding: 15px; /* Reduced card padding */
+    padding-bottom: 15px; /* Consistent bottom padding */
+}
+
+/* 4. Form Structure - MINIMIZED */
+.form-section {
+    border: 1px solid #e9ecef;
+    padding: 8px; /* Reduced section padding */
+    margin-bottom: 10px; /* Reduced spacing between sections */
+    border-radius: 8px;
+    padding-bottom: 5px; /* Minimized bottom padding within section */
+}
+
+.form-section legend {
+    font-size: 0.95em; /* Smaller legend font */
+    font-weight: 600;
+    color: #343a40;
+    padding: 0 8px;
+    margin-left: -8px;
+}
+
+.form-group {
+    margin-bottom: 8px; /* Reduced spacing between individual form fields */
+}
+
+/* Class for the very last form-group in a section/container to remove its bottom margin */
+.last-form-group {
+    margin-bottom: 0 !important;
+}
+
+.form-group label {
+    display: block;
+    margin-bottom: 2px; /* Reduced space between label and input */
+    font-weight: 500;
+    color: #495057;
+    font-size: 0.9em; /* Smaller label font */
+}
+
+/* 5. Input Styles - MINIMIZED */
+.smtp-form input[type="email"],
+.smtp-form input[type="password"],
+.smtp-form input[type="text"],
+.smtp-form textarea {
+    width: 100%;
+    padding: 7px 9px; /* Reduced input padding */
+    border: 1px solid #ced4da;
+    border-radius: 6px;
+    box-sizing: border-box;
+    font-size: 0.9em; /* Smaller input font */
+}
+
+.smtp-form textarea {
+    resize: vertical;
+}
+
+.smtp-form input:focus,
+.smtp-form textarea:focus {
+    border-color: var(--primary-color);
+    box-shadow: 0 0 0 0.2rem rgba(0, 123, 255, 0.25);
+    outline: none;
+}
+
+/* 6. Button Style - MINIMIZED */
+.btn-send {
+    width: 100%;
+    padding: 9px; /* Reduced button padding */
+    background-color: #28a745;
+    color: white;
+    border: none;
+    border-radius: 6px;
+    font-size: 0.95em; /* Smaller button font */
+    font-weight: 600;
+    cursor: pointer;
+    transition: background-color 0.3s;
+    margin-top: 10px; /* Reduced margin above the button */
+}
+
+.btn-send:hover {
+    background-color: #218838;
+}
+
+.btn-send i {
+    margin-right: 6px;
+}
+
+/* 7. Result Message - MINIMIZED */
+.result-message {
+    margin-top: 10px; /* Reduced margin above the result message */
+    padding: 8px; /* Reduced result message padding */
+    border-radius: 6px;
+    text-align: center;
+    font-weight: 500;
+    border: 1px solid transparent;
+    min-height: 35px;
+    font-size: 0.9em;
+}
+
+/* 8. Text Muted for Help Text - SMALLER SIZE */
+.text-muted {
+    font-size: 0.75em; /* Smallest help text */
+    color: var(--secondary-color);
+    margin-top: 3px;
+    display: block;
+}
+
+/* Specific adjustment for file upload group */
+.file-upload-group {
+    margin-top: 5px; /* Tighten up spacing above file upload */
+    margin-bottom: 0; /* Remove margin-bottom from the group */
+}
+</style>
+
+<script>
+// *** JAVASCRIPT LOGIC (Unchanged, as it handles functionality) ***
+document.getElementById('smtpForm').addEventListener('submit', async (e) => {
+    e.preventDefault();
+    const resultDiv = document.getElementById('result');
+    resultDiv.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Sending...'; // Loading indicator
+    resultDiv.className = 'result-message'; // Reset class to ensure new styles apply
+
+    const formData = new FormData();
+    formData.append('sender', document.getElementById('sender').value);
+    formData.append('pwd', document.getElementById('pwd').value);
+    formData.append('receiver', document.getElementById('receiver').value);
+    formData.append('subject', document.getElementById('subject').value);
+    formData.append('message', document.getElementById('message').value);
+
+    const files = document.getElementById('attachments').files;
+    for (let i = 0; i < files.length; i++) {
+        formData.append('attachments', files[i]);
+    }
+
+    try {
+        // NOTE: This assumes an API endpoint /api/send_smtp_email/ is set up
+        const res = await fetch('/api/send_smtp_email/', {
+            method: 'POST',
+            body: formData
+        });
+
+        const result = await res.json();
+
+        // Add success/danger classes based on API result
+        if (result.success) {
+            resultDiv.innerHTML = `✅ ${result.message}`;
+            resultDiv.classList.add('alert-success');
+            // Optional: Clear form on success
+            document.getElementById('smtpForm').reset();
+        } else {
+            resultDiv.innerHTML = `❌ ${result.message}`;
+            resultDiv.classList.add('alert-danger');
+        }
+    } catch (error) {
+        resultDiv.innerHTML = `❌ An unexpected error occurred: ${error.message}`;
+        resultDiv.classList.add('alert-danger');
+    }
+});
+</script>
+{% endblock %}

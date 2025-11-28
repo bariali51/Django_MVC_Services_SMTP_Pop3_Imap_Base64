@@ -1,0 +1,416 @@
+{% extends 'service_app/base.html' %}
+{% load static %}
+
+{% block content %}
+<style>
+/* 🎨 Professional GUI Design Styles */
+
+:root {
+    --primary-color: #007bff; /* Blue for primary actions/accents */
+    --secondary-color: #6c757d; /* Grey for secondary text */
+    --background-color: #f4f7f6; /* Light grey background */
+    --panel-background: #ffffff; /* White panel background */
+    --border-color: #e0e6ed; /* Light border color */
+    --hover-color: #e9ecef; /* Item hover background */
+    --unread-color: #fff8e1; /* Light yellow for unread emails */
+    --error-color: #dc3545; /* Red for errors */
+    --success-color: #28a745; /* Green for success */
+    --font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+}
+
+body {
+    font-family: var(--font-family);
+    background-color: var(--background-color);
+    color: #343a40; /* Dark text */
+}
+
+/* --- Header & Login Form --- */
+.client-header {
+    background: var(--panel-background);
+    padding: 15px 20px;
+    border-bottom: 1px solid var(--border-color);
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
+}
+
+.client-header h2 {
+    margin: 0;
+    font-size: 1.5rem;
+    color: var(--primary-color);
+}
+
+.login-form-group {
+    display: flex;
+    gap: 10px;
+    align-items: center;
+}
+
+.login-form-group input[type="email"],
+.login-form-group input[type="password"] {
+    padding: 8px 12px;
+    border: 1px solid var(--border-color);
+    border-radius: 4px;
+    font-size: 0.9rem;
+    width: 200px;
+    transition: border-color 0.2s;
+}
+
+.login-form-group input:focus {
+    border-color: var(--primary-color);
+    outline: none;
+    box-shadow: 0 0 0 2px rgba(0, 123, 255, 0.25);
+}
+
+#pop3-login-btn {
+    padding: 8px 15px;
+    background-color: var(--primary-color);
+    color: white;
+    border: none;
+    border-radius: 4px;
+    cursor: pointer;
+    font-weight: 600;
+    transition: background-color 0.2s, opacity 0.2s;
+}
+
+#pop3-login-btn:hover:not(:disabled) {
+    background-color: #0056b3;
+}
+
+#pop3-login-btn:disabled {
+    background-color: var(--secondary-color);
+    opacity: 0.6;
+    cursor: default;
+}
+
+/* --- Main Layout: 3 Panels --- */
+.client-layout {
+    display: flex;
+    height: calc(100vh - 70px); /* Adjust height to fit screen, accounting for header */
+    overflow: hidden;
+}
+
+/* --- 1. Sidebar Panel (Folders) --- */
+.sidebar-panel {
+    flex-basis: 200px;
+    min-width: 200px;
+    background: #f8f9fa; /* Lighter background for sidebar */
+    padding: 15px;
+    border-right: 1px solid var(--border-color);
+    overflow-y: auto;
+}
+
+.sidebar-panel h3 {
+    margin-top: 0;
+    margin-bottom: 15px;
+    font-size: 1.1rem;
+    color: #495057;
+    border-bottom: 1px solid var(--border-color);
+    padding-bottom: 5px;
+}
+
+.folder-item {
+    padding: 8px 10px;
+    margin-bottom: 5px;
+    border-radius: 4px;
+    cursor: pointer;
+    font-size: 0.95rem;
+    transition: background-color 0.2s, color 0.2s;
+}
+
+.folder-item:hover {
+    background-color: var(--hover-color);
+}
+
+.folder-item.active {
+    background-color: var(--primary-color);
+    color: white;
+    font-weight: 600;
+}
+
+/* --- 2. List Panel (Email List) --- */
+.list-panel {
+    flex-basis: 300px;
+    min-width: 250px;
+    max-width: 350px;
+    background: var(--panel-background);
+    border-right: 1px solid var(--border-color);
+    overflow-y: auto;
+}
+
+.email-loading, .error-message {
+    padding: 20px;
+    text-align: center;
+    color: var(--secondary-color);
+}
+
+.error-message {
+    color: var(--error-color);
+    font-weight: 600;
+}
+
+.email-item {
+    padding: 10px 15px;
+    border-bottom: 1px solid var(--border-color);
+    cursor: pointer;
+    transition: background-color 0.2s;
+}
+
+.email-item:hover {
+    background-color: var(--hover-color);
+}
+
+.email-item.selected {
+    background-color: #dae7ff; /* Light primary color for selection */
+    border-left: 3px solid var(--primary-color);
+    padding-left: 12px; /* Adjust padding due to border */
+}
+
+.email-item.unread {
+    background-color: var(--unread-color);
+    font-weight: 600; /* Bold for unread */
+}
+
+.email-item.unread:hover {
+    background-color: #f7e6c4;
+}
+
+.email-item .subject {
+    font-size: 1rem;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    color: #212529;
+    margin-bottom: 3px;
+}
+
+.email-item .from {
+    font-size: 0.85rem;
+    color: var(--secondary-color);
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
+.email-item.selected .from {
+    color: #495057; /* Slightly darker grey when selected */
+}
+
+.email-item.unread .from {
+    color: #5d5d5d;
+}
+
+
+/* --- 3. Content Panel (Email View) --- */
+.content-panel {
+    flex-grow: 1;
+    background: var(--panel-background);
+    padding: 20px;
+    overflow-y: auto;
+}
+
+.content-placeholder {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    height: 100%;
+    color: var(--secondary-color);
+    font-size: 1.1rem;
+    text-align: center;
+}
+
+.email-details h3 {
+    margin-top: 0;
+    margin-bottom: 15px;
+    font-size: 1.8rem;
+    border-bottom: 1px solid var(--border-color);
+    padding-bottom: 10px;
+}
+
+.email-details .meta {
+    background-color: #f8f9fa;
+    padding: 10px 15px;
+    border: 1px solid var(--border-color);
+    border-radius: 4px;
+    margin-bottom: 20px;
+    font-size: 0.9rem;
+    color: #495057;
+}
+
+.email-body-content {
+    line-height: 1.6;
+    font-size: 1rem;
+    white-space: pre-wrap; /* Respect line breaks and spaces */
+    word-wrap: break-word; /* Ensure long words break */
+}
+
+/* Arabic Specific Styling */
+/* If the overall application is RTL, apply it globally.
+   For this specific page, we'll ensure alignment works. */
+/* If the content is mixed, specific elements may need dir="auto" */
+/* The existing CSS is largely LTR-friendly, but we keep the comment for context. */
+
+</style>
+
+<div class="client-header">
+    <h2>📥 POP3 Client </h2>
+    <form id="pop3-form" class="login-form-group">
+        <input type="email" id="pop3-email" placeholder="Email" required autocomplete="username">
+        <input type="password" id="pop3-password" placeholder="Password" required autocomplete="current-password">
+        <button type="submit" id="pop3-login-btn">Login</button>
+    </form>
+</div>
+
+<div class="client-layout">
+
+    <div class="sidebar-panel">
+        <h3> Folders </h3>
+        <div class="folder-item active" data-folder="INBOX">Inbox</div>
+        <div class="folder-item" data-folder="SENT">Sent Items</div>
+        <div class="folder-item" data-folder="DRAFTS">Drafts</div>
+        <div class="folder-item" data-folder="TRASH">Trash</div>
+        <div class="folder-item" data-folder="SPAM">Spam</div>
+        </div>
+
+    <div class="list-panel" id="pop3-list-panel">
+        <div class="email-loading" id="pop3-list-status">Please log in to load emails.</div>
+    </div>
+
+    <div class="content-panel" id="pop3-content-panel">
+        <div class="content-placeholder" id="pop3-content-placeholder">Select an email to view its content.</div>
+    </div>
+</div>
+
+<script>
+// *** JAVASCRIPT LOGIC (Unchanged, as it handles functionality) ***
+const pop3Form = document.getElementById("pop3-form");
+const listPanel = document.getElementById("pop3-list-panel");
+const contentPanel = document.getElementById("pop3-content-panel");
+const listStatus = document.getElementById("pop3-list-status");
+const loginBtn = document.getElementById("pop3-login-btn");
+let currentEmails = [];
+let selectedEmailId = null;
+
+function renderError(message) {
+    listPanel.innerHTML = `<div class="email-loading error-message">${message}</div>`;
+    contentPanel.innerHTML = `<div class="content-placeholder">${message}</div>`;
+}
+
+// Login + fetch emails
+pop3Form.addEventListener("submit", async function(e){
+    e.preventDefault();
+
+    listPanel.innerHTML = `<div class="email-loading">Connecting...</div>`;
+    contentPanel.innerHTML = `<div class="content-placeholder">...</div>`;
+    loginBtn.disabled = true;
+    loginBtn.innerText = 'Connecting...';
+
+    const data = {
+        email: document.getElementById("pop3-email").value.trim(),
+        password: document.getElementById("pop3-password").value.trim()
+    };
+
+    try {
+        // Assume /api/pop3_login/ exists and works as intended
+        const resp = await fetch("/api/pop3_login/", {
+            method: "POST",
+            headers: {'Content-Type':'application/json', 'X-CSRFToken': '{{ csrf_token }}'},
+            body: JSON.stringify(data)
+        });
+        const result = await resp.json();
+
+        if(result.success){
+            currentEmails = result.emails;
+            renderEmailList(currentEmails);
+            // listStatus removal is handled by renderEmailList now, but keep for fallback
+            const statusEl = document.getElementById("pop3-list-status");
+            if (statusEl) statusEl.remove();
+        } else {
+            renderError(result.message || "Login failed. Check credentials and server settings.");
+        }
+    } catch (error) {
+        renderError("A network error occurred. Could not reach the server.");
+        console.error(error);
+    } finally {
+        loginBtn.disabled = false;
+        loginBtn.innerText = 'Login';
+    }
+});
+
+// Renders email list
+function renderEmailList(emails) {
+    listPanel.innerHTML = '';
+    if (emails.length === 0) {
+        listPanel.innerHTML = `<div class="email-loading">No emails in this folder.</div>`;
+        return;
+    }
+    emails.forEach((email, index) => {
+        const div = document.createElement("div");
+        const emailId = index;
+        // Use `read` status from the email object
+        const isRead = email.read !== undefined ? email.read : true;
+        div.className = "email-item " + (isRead ? '' : 'unread');
+        div.setAttribute('data-id', emailId);
+        div.innerHTML = `
+            <div class="subject">${email.subject || '(No Subject)'}</div>
+            <div class="from">${email.from || 'Unknown Sender'}</div>
+        `;
+        div.addEventListener("click", () => handleEmailSelect(emailId, email));
+        listPanel.appendChild(div);
+    });
+}
+
+// Select email
+function handleEmailSelect(emailId, emailData) {
+    document.querySelectorAll('.email-item').forEach(el => el.classList.remove('selected'));
+    const selectedEl = document.querySelector(`.email-item[data-id="${emailId}"]`);
+    if (selectedEl) {
+        selectedEl.classList.add('selected');
+        // Mark as read visually
+        selectedEl.classList.remove('unread');
+        // Note: You would typically send an API call here to mark it as read on the server
+    }
+    renderEmailContent(emailData);
+    selectedEmailId = emailId;
+}
+
+// Render email content
+function renderEmailContent(email) {
+    contentPanel.innerHTML = `
+        <div class="email-details">
+            <h3>${email.subject || '(No Subject)'}</h3>
+            <div class="meta">
+                <strong>From:</strong> ${email.from || 'Unknown'} |
+                <strong>To:</strong> ${email.to || 'n/a'} |
+                <strong>Date:</strong> ${email.date || 'n/a'}
+            </div>
+            <div class="email-body-content">
+                ${email.body || 'No body content available.'}
+            </div>
+        </div>
+    `;
+}
+
+// Folder click (currently only visual)
+document.querySelectorAll('.folder-item').forEach(folder => {
+    folder.addEventListener('click', function() {
+        // Visual selection
+        document.querySelectorAll('.folder-item').forEach(el => el.classList.remove('active'));
+        this.classList.add('active');
+
+        // **TODO: Implement API call here to fetch emails for the selected folder**
+
+        // For now, reset view on folder change (simulated)
+        listPanel.innerHTML = `<div class="email-loading">Loading emails for ${this.innerText}...</div>`;
+        contentPanel.innerHTML = `<div class="content-placeholder">Select an email to view its content.</div>`;
+        currentEmails = [];
+    });
+});
+
+// Initialize content panel
+document.addEventListener('DOMContentLoaded', () => {
+    contentPanel.innerHTML = `<div class="content-placeholder" id="pop3-content-placeholder">Select an email to view its content.</div>`;
+});
+</script>
+{% endblock %}

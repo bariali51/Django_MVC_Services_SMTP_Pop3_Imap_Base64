@@ -1,0 +1,122 @@
+[
+  {
+    "time": "2025-11-26T19:58:12.219484Z",
+    "action": "urlsafe-encode-text",
+    "input": "UHl0aG9u",
+    "output": "VUhsMGFHOXU"
+  },
+  {
+    "time": "2025-11-26T19:58:17.136645Z",
+    "action": "urlsafe-encode-text",
+    "input": "UHl0aG9u",
+    "output": "VUhsMGFHOXU"
+  },
+  {
+    "time": "2025-11-26T19:58:43.132461Z",
+    "action": "decode-text",
+    "input": "UHl0aG9u",
+    "output": "Python"
+  },
+  {
+    "time": "2025-11-26T19:58:45.309589Z",
+    "action": "encode-text",
+    "input": "UHl0aG9u",
+    "output": "VUhsMGFHOXU="
+  },
+  {
+    "time": "2025-11-26T19:58:45.902913Z",
+    "action": "decode-text",
+    "input": "UHl0aG9u",
+    "output": "Python"
+  },
+  {
+    "time": "2025-11-26T20:00:03.505845Z",
+    "action": "decode-text",
+    "input": "SGVsbG8sIFdvcmxkIQ==",
+    "output": "Hello, World!"
+  },
+  {
+    "time": "2025-11-26T20:00:09.330867Z",
+    "action": "decode-text",
+    "input": "SGVsbG8sIFdvcmxkIQ==",
+    "output": "Hello, World!"
+  },
+  {
+    "time": "2025-11-26T20:00:33.177571Z",
+    "action": "decode-text",
+    "input": "SG93IGFyZSB5b3U/",
+    "output": "How are you?"
+  },
+  {
+    "time": "2025-11-26T20:09:17.472866Z",
+    "action": "encode-text",
+    "input": "SGVsbG8sIFdvcmxkIQ==",
+    "output": "U0dWc2JHOHNJRmR2Y214a0lRPT0="
+  },
+  {
+    "time": "2025-11-26T20:09:18.367855Z",
+    "action": "decode-text",
+    "input": "SGVsbG8sIFdvcmxkIQ==",
+    "output": "Hello, World!"
+  },
+  {
+    "time": "2025-11-26T20:09:19.719713Z",
+    "action": "urlsafe-encode-text",
+    "input": "SGVsbG8sIFdvcmxkIQ==",
+    "output": "U0dWc2JHOHNJRmR2Y214a0lRPT0"
+  },
+  {
+    "time": "2025-11-26T20:09:28.803862Z",
+    "action": "encode-file",
+    "input": "C:\\Users\\Red Hat\\Desktop\\en.txt",
+    "output": "C:\\Users\\Red Hat\\Desktop\\ennn.txt"
+  },
+  {
+    "time": "2025-11-26T20:09:29.806452Z",
+    "action": "decode-file",
+    "input": "C:\\Users\\Red Hat\\Desktop\\en.txt",
+    "output": "C:\\Users\\Red Hat\\Desktop\\ennn.txt"
+  },
+  {
+    "time": "2025-11-26T20:09:30.810108Z",
+    "action": "encode-file",
+    "input": "C:\\Users\\Red Hat\\Desktop\\en.txt",
+    "output": "C:\\Users\\Red Hat\\Desktop\\ennn.txt"
+  },
+  {
+    "time": "2025-11-26T20:20:31.213509Z",
+    "action": "encode-text",
+    "input": "SGVsbG8sIFdvcmxkIQ==",
+    "output": "U0dWc2JHOHNJRmR2Y214a0lRPT0="
+  },
+  {
+    "time": "2025-11-26T20:20:38.009520Z",
+    "action": "decode-text",
+    "input": "SGVsbG8sIFdvcmxkIQ==",
+    "output": "Hello, World!"
+  },
+  {
+    "time": "2025-11-26T20:21:04.272279Z",
+    "action": "urlsafe-encode-text",
+    "input": "SGVsbG8sIFdvcmxkIQ==",
+    "output": "U0dWc2JHOHNJRmR2Y214a0lRPT0"
+  },
+  {
+    "time": "2025-11-26T20:21:07.140316Z",
+    "action": "urlsafe-encode-text",
+    "input": "SGVsbG8sIFdvcmxkIQ==",
+    "output": "U0dWc2JHOHNJRmR2Y214a0lRPT0"
+  },
+  {
+    "time": "2025-11-26T20:21:19.975182Z",
+    "action": "encode-file",
+    "input": "C:\\Users\\Red Hat\\Desktop\\en.txt",
+    "output": "C:\\Users\\Red Hat\\Desktop\\ennn.txt"
+  },
+  {
+    "time": "2025-11-26T20:21:27.959904Z",
+    "action": "decode-file",
+    "input": "C:\\Users\\Red Hat\\Desktop\\en.txt",
+    "output": "C:\\Users\\Red Hat\\Desktop\\ennn.txt"
+  }
+]

@@ -1,0 +1,359 @@
+{% extends 'service_app/base.html' %}
+{% load static %}
+
+{% block content %}
+<style>
+    /* ---------------------------------------------------- */
+    /* PRO GUI IMAP CLIENT STYLES */
+    /* ---------------------------------------------------- */
+    :root {
+        --bg-main: #f4f7f9;        /* Light background for overall page */
+        --bg-panel: #ffffff;       /* White background for main panels */
+        --text-color: #2c3e50;     /* Dark text */
+        --border-color: #dfe6e9;   /* Light gray border */
+        --accent-color: #007bff;   /* Primary blue accent */
+        --accent-hover: #0056b3;
+        --unread-bg: #e6f2ff;      /* Light blue for unread items */
+        --sidebar-bg: #34495e;     /* Dark sidebar for navigation contrast */
+        --sidebar-text: #ecf0f1;
+        --header-height: 50px;
+    }
+
+    body {
+        font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        background-color: var(--bg-main);
+        color: var(--text-color);
+        margin: 0;
+        padding: 0;
+    }
+
+    /* Header for Login/Controls */
+    .client-header {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        padding: 10px 20px;
+        background-color: var(--bg-panel);
+        border-bottom: 1px solid var(--border-color);
+        box-shadow: 0 1px 3px rgba(0, 0, 0, 0.05);
+        height: var(--header-height);
+    }
+    .client-header h2 {
+        margin: 0;
+        font-size: 1.5em;
+        color: var(--accent-color);
+    }
+
+    /* Login Form Styles */
+    .login-form-group {
+        display: flex;
+        gap: 10px;
+    }
+    .login-form-group input {
+        padding: 8px 12px;
+        font-size: 14px;
+        border: 1px solid var(--border-color);
+        border-radius: 4px;
+        width: 180px;
+        transition: border-color 0.2s;
+    }
+    .login-form-group input:focus {
+        border-color: var(--accent-color);
+        outline: none;
+    }
+    .login-form-group button {
+        padding: 8px 15px;
+        font-size: 14px;
+        cursor: pointer;
+        background-color: var(--accent-color);
+        color: white;
+        border: none;
+        border-radius: 4px;
+        transition: background-color 0.2s;
+    }
+    .login-form-group button:hover {
+        background-color: var(--accent-hover);
+    }
+
+    /* Main Three-Panel Layout */
+    .client-layout {
+        display: flex;
+        height: calc(100vh - var(--header-height) - 20px); /* Full viewport height minus header */
+        margin: 10px;
+        border: 1px solid var(--border-color);
+        border-radius: 8px;
+        overflow: hidden;
+    }
+
+    /* 1. Folders/Sidebar Panel */
+    .sidebar-panel {
+        width: 200px;
+        background-color: var(--sidebar-bg);
+        color: var(--sidebar-text);
+        padding: 15px 0;
+        flex-shrink: 0;
+    }
+    .sidebar-panel h3 {
+        margin: 0 15px 15px;
+        font-size: 1.1em;
+        border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+        padding-bottom: 8px;
+    }
+    .folder-item {
+        padding: 10px 15px;
+        cursor: pointer;
+        transition: background-color 0.2s;
+        font-size: 0.95em;
+    }
+    .folder-item:hover, .folder-item.active {
+        background-color: #2c3e50;
+    }
+    .folder-item.active {
+        border-left: 3px solid var(--accent-color);
+        padding-left: 12px;
+    }
+
+    /* 2. Email List Panel */
+    .list-panel {
+        width: 300px;
+        background-color: var(--bg-panel);
+        border-right: 1px solid var(--border-color);
+        overflow-y: auto;
+        flex-shrink: 0;
+    }
+    .email-item {
+        padding: 12px 15px;
+        border-bottom: 1px solid var(--border-color);
+        cursor: pointer;
+        transition: background-color 0.2s;
+        overflow: hidden;
+    }
+    .email-item.unread {
+        background-color: var(--unread-bg);
+    }
+    .email-item:hover {
+        background-color: #f0f8ff;
+    }
+    .email-item.selected {
+        background-color: var(--accent-color);
+        color: white;
+    }
+    .email-item.selected * {
+        color: white !important;
+    }
+    .email-item .subject {
+        font-weight: bold;
+        color: var(--text-color);
+        font-size: 1em;
+        white-space: nowrap;
+        overflow: hidden;
+        text-overflow: ellipsis;
+    }
+    .email-item .from {
+        font-size: 0.9em;
+        color: #7f8c8d;
+        margin-top: 2px;
+        white-space: nowrap;
+        overflow: hidden;
+        text-overflow: ellipsis;
+    }
+    .email-item.selected .subject, .email-item.selected .from {
+        color: white;
+    }
+    .email-loading {
+        padding: 20px;
+        text-align: center;
+        color: #95a5a6;
+    }
+
+    /* 3. Content View Panel */
+    .content-panel {
+        flex-grow: 1;
+        background-color: var(--bg-panel);
+        overflow-y: auto;
+        padding: 20px;
+    }
+    .content-placeholder {
+        padding: 50px;
+        text-align: center;
+        color: #bdc3c7;
+        font-size: 1.2em;
+    }
+    .email-details h3 {
+        color: var(--text-color);
+        margin: 0 0 5px 0;
+    }
+    .email-details .meta {
+        font-size: 0.9em;
+        color: #7f8c8d;
+        border-bottom: 1px solid var(--border-color);
+        padding-bottom: 10px;
+        margin-bottom: 15px;
+    }
+    .email-body-content {
+        line-height: 1.6;
+        white-space: pre-wrap; /* Preserve formatting */
+    }
+    .error-message {
+        padding: 15px;
+        background-color: #fcebeb;
+        border: 1px solid #e84118;
+        color: #e84118;
+        border-radius: 4px;
+        margin: 10px 0;
+        text-align: center;
+    }
+
+</style>
+
+<div class="client-header">
+    <h2>📥 IMAP Client</h2>
+    <form id="imap-form" class="login-form-group">
+        <input type="email" id="email" placeholder="Email" required autocomplete="username">
+        <input type="password" id="password" placeholder="Password" required autocomplete="current-password">
+        <button type="submit" id="login-btn">Login</button>
+    </form>
+</div>
+
+<div class="client-layout">
+
+    <div class="sidebar-panel">
+        <h3>Folders</h3>
+        <div class="folder-item active" data-folder="INBOX">Inbox</div>
+    </div>
+
+    <div class="list-panel" id="imap-list-panel">
+        <div class="email-loading" id="list-status">Please log in to load emails.</div>
+    </div>
+
+    <div class="content-panel" id="imap-content-panel">
+        <div class="content-placeholder" id="content-placeholder">Select an email to view its content.</div>
+    </div>
+</div>
+
+<script>
+    const imapForm = document.getElementById("imap-form");
+    const listPanel = document.getElementById("imap-list-panel");
+    const contentPanel = document.getElementById("imap-content-panel");
+    const listStatus = document.getElementById("list-status");
+    const loginBtn = document.getElementById("login-btn");
+    let currentEmails = [];
+    let selectedEmailId = null;
+
+    // Helper to render error messages
+    function renderError(message) {
+        listPanel.innerHTML = `<div class="email-loading error-message">${message}</div>`;
+        contentPanel.innerHTML = `<div class="content-placeholder">${message}</div>`;
+    }
+
+    // Function to handle login and email list fetch
+    imapForm.addEventListener("submit", async function(e){
+        e.preventDefault();
+
+        listPanel.innerHTML = `<div class="email-loading">Connecting...</div>`;
+        contentPanel.innerHTML = `<div class="content-placeholder">...</div>`;
+        loginBtn.disabled = true;
+        loginBtn.innerText = 'Connecting...';
+
+        const data = {
+            email: document.getElementById("email").value.trim(),
+            password: document.getElementById("password").value.trim()
+        };
+
+        try {
+            // NOTE: Add X-CSRFToken header for Django POST requests!
+            const resp = await fetch("/api/imap_login/", {
+                method: "POST",
+                headers: {'Content-Type':'application/json', 'X-CSRFToken': '{{ csrf_token }}'},
+                body: JSON.stringify(data)
+            });
+            const result = await resp.json();
+
+            if(result.success){
+                currentEmails = result.emails;
+                renderEmailList(currentEmails);
+                listStatus.remove();
+            } else {
+                renderError(result.message || "Login failed. Check credentials and server settings.");
+            }
+        } catch (error) {
+            renderError("A network error occurred. Could not reach the server.");
+            console.error(error);
+        } finally {
+            loginBtn.disabled = false;
+            loginBtn.innerText = 'Login';
+        }
+    });
+
+    // Renders the list of emails in the middle panel
+    function renderEmailList(emails) {
+        listPanel.innerHTML = ''; // Clear existing list
+        emails.forEach((email, index) => {
+            const div = document.createElement("div");
+            // Assuming the server returns a unique ID for the email. Using index as fallback.
+            const emailId = email.uid || index;
+
+            div.className = "email-item " + (email.read ? '' : 'unread');
+            div.setAttribute('data-id', emailId);
+
+            div.innerHTML = `
+                <div class="subject">${email.subject || '(No Subject)'}</div>
+                <div class="from">${email.from || 'Unknown Sender'}</div>
+            `;
+
+            div.addEventListener("click", () => {
+                handleEmailSelect(emailId, email);
+            });
+
+            listPanel.appendChild(div);
+        });
+    }
+
+    // Handles selecting an email item
+    function handleEmailSelect(emailId, emailData) {
+        // Remove 'selected' class from all previous items
+        document.querySelectorAll('.email-item').forEach(el => el.classList.remove('selected'));
+
+        // Add 'selected' class to the clicked item
+        const selectedEl = document.querySelector(`.email-item[data-id="${emailId}"]`);
+        if (selectedEl) {
+            selectedEl.classList.add('selected');
+            selectedEl.classList.remove('unread'); // Mark as read on selection
+        }
+
+        // Render email content
+        renderEmailContent(emailData);
+        selectedEmailId = emailId;
+    }
+
+    // Renders the email content in the right panel
+    function renderEmailContent(email) {
+        contentPanel.innerHTML = `
+            <div class="email-details">
+                <h3>${email.subject || '(No Subject)'}</h3>
+                <div class="meta">
+                    <strong>From:</strong> ${email.from || 'Unknown'} &lt;${email.sender_email || 'n/a'}&gt; |
+                    <strong>To:</strong> ${email.to || 'n/a'} |
+                    <strong>Date:</strong> ${email.date || 'n/a'}
+                </div>
+                <div class="email-body-content">
+                    ${email.body || 'No body content available.'}
+                </div>
+            </div>
+        `;
+    }
+
+    // Initial load setup (simulated folder click)
+    document.querySelector('.folder-item[data-folder="INBOX"]').addEventListener('click', () => {
+        // Logic to switch folder should go here. For now, it just visually activates the folder.
+        document.querySelectorAll('.folder-item').forEach(el => el.classList.remove('active'));
+        document.querySelector('.folder-item[data-folder="INBOX"]').classList.add('active');
+
+        // If already logged in, you'd call a function here to fetch INBOX emails:
+        // if (currentEmails.length > 0) renderEmailList(currentEmails);
+    });
+
+    // Ensure the content placeholder is visible on load
+    contentPanel.innerHTML = `<div class="content-placeholder" id="content-placeholder">Select an email to view its content.</div>`;
+</script>
+{% endblock %}

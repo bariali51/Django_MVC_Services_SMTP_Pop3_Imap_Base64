@@ -1,0 +1,419 @@
+{% extends 'service_app/base.html' %}
+{% load static %}
+
+{% block content %}
+<style>
+    /* ---------------------------------------------------- */
+    /* PRO GUI LIGHT/WHITE THEME CSS */
+    /* ---------------------------------------------------- */
+    :root {
+        --bg-main: #ffffff;       /* Main white background */
+        --bg-secondary: #f4f7f9;  /* Light gray background for elements/tabs */
+        --text-color: #2c3e50;    /* Dark blue/gray text */
+        --border-color: #dfe6e9;  /* Light border */
+        --accent-color: #007bff;  /* Blue accent for buttons/focus */
+        --accent-hover: #0056b3;  /* Darker blue on hover */
+        --note-color: #e84118;    /* Red/Orange for notes/errors */
+        --success-color: #27ae60; /* Green for success */
+        --code-bg: #ecf0f1;       /* Very light gray for text areas */
+    }
+
+    /* Apply base styling to the content block */
+    .pro-gui-container {
+        background-color: var(--bg-main);
+        color: var(--text-color);
+        padding: 25px;
+        border-radius: 10px;
+        box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1); /* Soft shadow */
+    }
+
+    h2 {
+        color: var(--accent-hover);
+        border-bottom: 2px solid var(--border-color);
+        padding-bottom: 10px;
+        margin-bottom: 15px;
+    }
+
+    h3 {
+        color: var(--text-color);
+        margin-top: 20px;
+        font-weight: 600;
+    }
+
+    /* Tabs Styling */
+    .tabs {
+        display: flex;
+        border-bottom: 2px solid var(--border-color);
+        margin-bottom: 1px;
+    }
+    .tabs button {
+        background-color: var(--bg-secondary);
+        color: var(--text-color);
+        flex-grow: 1;
+        border: none;
+        outline: none;
+        cursor: pointer;
+        padding: 12px 16px;
+        transition: all 0.2s ease;
+        font-size: 15px;
+        margin-right: 1px;
+        border-radius: 6px 6px 0 0;
+        border: 1px solid var(--border-color);
+        border-bottom: none;
+    }
+    .tabs button:hover:not(.active) {
+        background-color: #dcdde1;
+    }
+    .tabs button.active {
+        background-color: var(--bg-main);
+        color: var(--accent-color);
+        border-bottom: 2px solid var(--bg-main); /* Hides the container border */
+        font-weight: bold;
+        transform: translateY(0);
+    }
+
+    .tabcontent {
+        padding: 20px;
+        border: 1px solid var(--border-color);
+        border-top: 1px solid var(--bg-main); /* Clean up the top border overlap */
+        border-radius: 0 0 10px 10px;
+        background-color: var(--bg-main);
+    }
+
+    /* Textarea and Input Styling */
+    textarea, input[type="text"] {
+        width: 100%;
+        min-height: 150px;
+        box-sizing: border-box;
+        margin-bottom: 15px;
+        padding: 12px;
+        font-family: Consolas, monospace;
+        font-size: 14px;
+        background-color: var(--code-bg); /* Light code background */
+        color: var(--text-color);
+        border: 1px solid var(--border-color);
+        border-radius: 4px;
+        resize: vertical;
+        transition: border-color 0.2s;
+    }
+    input[type="text"] { min-height: unset; height: 40px; }
+    textarea:focus, input[type="text"]:focus {
+        border-color: var(--accent-color);
+        box-shadow: 0 0 5px rgba(0, 123, 255, 0.2);
+        outline: none;
+        background-color: white;
+    }
+
+    /* Button Styling */
+    button {
+        background-color: var(--accent-color);
+        color: #fff;
+        border: none;
+        padding: 10px 20px;
+        margin-right: 10px;
+        border-radius: 5px;
+        cursor: pointer;
+        transition: background-color 0.2s ease, box-shadow 0.1s ease;
+        font-weight: 500;
+        box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+    }
+    button:hover {
+        background-color: var(--accent-hover);
+        box-shadow: 0 3px 6px rgba(0, 0, 0, 0.15);
+    }
+
+    /* Secondary/Optimizer buttons (use a different color for clarity) */
+    #urlsafe-encode-btn, #urlsafe-decode-btn {
+        background-color: var(--success-color); /* Green tone */
+    }
+    #urlsafe-encode-btn:hover, #urlsafe-decode-btn:hover {
+        background-color: #1e8449;
+    }
+
+    /* History Table Styling */
+    .history-table {
+        width: 100%;
+        border-collapse: separate;
+        border-spacing: 0;
+        margin-top: 15px;
+        font-size: 0.85em;
+        border-radius: 6px;
+        overflow: hidden; /* Ensures border radius works */
+    }
+    .history-table th, .history-table td {
+        border: 1px solid var(--border-color);
+        padding: 10px;
+        text-align: left;
+    }
+    .history-table th {
+        background-color: var(--bg-secondary);
+        color: var(--text-color);
+        font-weight: bold;
+    }
+    .history-table td {
+        background-color: var(--bg-main);
+    }
+    .note {
+        color: var(--note-color);
+        background-color: #fcebeb;
+        padding: 15px;
+        border-radius: 4px;
+        border-left: 5px solid var(--note-color);
+        margin-bottom: 20px;
+    }
+    .file-input-group label {
+        display: block;
+        margin-bottom: 5px;
+        font-weight: 600;
+    }
+    .file-input-group input {
+        margin-bottom: 15px;
+    }
+    #file-result {
+        padding: 15px;
+        background-color: var(--code-bg);
+        border-radius: 4px;
+        margin-top: 20px;
+        font-weight: bold;
+        border-left: 5px solid var(--accent-color);
+        color: var(--text-color);
+    }
+
+</style>
+
+<div class="pro-gui-container">
+
+    <h2>🔑 Base64 Utility - Professional Interface</h2>
+    <hr>
+
+    <div class="tabs">
+        <button class="tablinks active" onclick="openTab(event, 'TextOps')">Text/URL Operations</button>
+        <button class="tablinks" onclick="openTab(event, 'FileOps')">File Operations (Simulated)</button>
+        <button class="tablinks" onclick="openTab(event, 'History')">Operation History</button>
+    </div>
+
+    <div id="TextOps" class="tabcontent" style="display: block;">
+        <h3>Input Text or Base64 String</h3>
+        <textarea id="text-input" placeholder="Enter text or Base64 string to process..."></textarea>
+
+        <div style="margin-bottom: 20px;">
+            <button id="encode-btn">➡️ Standard Encode</button>
+            <button id="decode-btn">⬅️ Standard Decode</button>
+            <button id="urlsafe-encode-btn">🔗 URL-Safe Encode (Web Optimizer)</button>
+            <button id="urlsafe-decode-btn">🔗 URL-Safe Decode (Web Optimizer)</button>
+        </div>
+
+        <h3>Output Result</h3>
+        <textarea id="b64-result" readonly placeholder="Result will appear here..."></textarea>
+    </div>
+
+    <div id="FileOps" class="tabcontent" style="display: none;">
+        <h3>File Path Operations (Simulated)</h3>
+        <p class="note">
+            **NOTE:** This tab is for UI demonstration. Real file uploads require a dedicated form and server logic.
+            These buttons simulate server-side file path handling.
+        </p>
+
+        <div class="file-input-group">
+            <label for="file-input-path">Input File Path (Simulated on Server):</label>
+            <input type="text" id="file-input-path" placeholder="/path/to/input.txt">
+        </div>
+
+        <div class="file-input-group">
+            <label for="file-output-path">Output File Path (Simulated on Server):</label>
+            <input type="text" id="file-output-path" placeholder="/path/to/output.b64">
+        </div>
+
+        <button id="file-encode-btn">📂 Encode File to Base64</button>
+        <button id="file-decode-btn">📝 Decode Base64 File</button>
+
+        <div id="file-result" style="margin-top: 20px;">Status: Awaiting operation...</div>
+    </div>
+
+    <div id="History" class="tabcontent" style="display: none;">
+        <h3>Operation History (Last {{ MAX_HISTORY|default:50 }} entries)</h3>
+        <div id="history-container">
+            <table class="history-table">
+                <thead>
+                    <tr><th>Time (UTC)</th><th>Action</th><th>Input Sample</th><th>Output Sample</th></tr>
+                </thead>
+                <tbody id="history-body">
+                    <tr><td colspan="4" style="text-align: center;">Loading history...</td></tr>
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>
+
+<script>
+    // --- The JavaScript logic remains the same as it handles the functionality, not the aesthetics ---
+
+    const MAX_HISTORY = {{ MAX_HISTORY|default:50 }};
+
+    function openTab(evt, tabName) {
+        let i, tabcontent, tablinks;
+        tabcontent = document.getElementsByClassName("tabcontent");
+        for (i = 0; i < tabcontent.length; i++) {
+            tabcontent[i].style.display = "none";
+        }
+        tablinks = document.getElementsByClassName("tablinks");
+        for (i = 0; i < tablinks.length; i++) {
+            tablinks[i].className = tablinks[i].className.replace(" active", "");
+        }
+        document.getElementById(tabName).style.display = "block";
+        evt.currentTarget.className += " active";
+
+        if (tabName === 'History') {
+            loadHistory();
+        }
+    }
+
+    async function callB64API(action, text, inputPath, outputPath) {
+        const payload = { action };
+        const fileResultEl = document.getElementById("file-result");
+        const b64ResultEl = document.getElementById("b64-result");
+
+        // Use colors appropriate for the light theme for feedback
+        const SUCCESS_COLOR = 'var(--success-color)';
+        const ERROR_COLOR = 'var(--note-color)';
+        const PENDING_COLOR = 'var(--accent-color)';
+
+        // Clear previous results/messages
+        if (action.includes('file')) {
+            fileResultEl.innerText = 'Processing...';
+            fileResultEl.style.borderLeftColor = PENDING_COLOR;
+        } else {
+            b64ResultEl.value = 'Processing...';
+        }
+
+        if (text !== undefined) {
+            payload.text = text;
+        }
+        if (inputPath !== undefined) {
+            payload.input_path = inputPath;
+        }
+        if (outputPath !== undefined) {
+            payload.output_path = outputPath;
+        }
+
+        try {
+            // NOTE: The fetch call requires the CSRF token for a Django POST request
+            const resp = await fetch("/api/b64_action/", {
+                method: "POST",
+                headers: {'X-CSRFToken': '{{ csrf_token }}', 'Content-Type':'application/json'},
+                body: JSON.stringify(payload)
+            });
+            const data = await resp.json();
+
+            if (data.success) {
+                 if (action.includes('file')) {
+                    fileResultEl.innerText = data.result || `Success: ${action.replace('_', ' ').toUpperCase()} operation completed.`;
+                    fileResultEl.style.borderLeftColor = SUCCESS_COLOR;
+                } else {
+                    b64ResultEl.value = data.result;
+                }
+                if (action !== 'get_history') {
+                    setTimeout(loadHistory, 300);
+                }
+            } else {
+                // Handle API error
+                const errorMessage = data.error || "An unknown server error occurred.";
+                 if (action.includes('file')) {
+                    fileResultEl.innerText = `ERROR: ${errorMessage}`;
+                    fileResultEl.style.borderLeftColor = ERROR_COLOR;
+                } else {
+                    b64ResultEl.value = `ERROR: ${errorMessage}`;
+                }
+            }
+
+        } catch (error) {
+            const errorMessage = "A network or server error occurred. See console for details.";
+            if (action.includes('file')) {
+                fileResultEl.innerText = `CRITICAL ERROR: ${errorMessage}`;
+                fileResultEl.style.borderLeftColor = ERROR_COLOR;
+            } else {
+                b64ResultEl.value = `CRITICAL ERROR: ${errorMessage}`;
+            }
+            console.error(error);
+        }
+    }
+
+    async function loadHistory() {
+        try {
+            const resp = await fetch("/api/b64_action/", {
+                method: "POST",
+                headers: {'X-CSRFToken': '{{ csrf_token }}', 'Content-Type':'application/json'},
+                body: JSON.stringify({action: 'get_history'})
+            });
+            const data = await resp.json();
+
+            const historyBody = document.getElementById("history-body");
+            historyBody.innerHTML = '';
+
+            if (data.success && data.history) {
+                const history = data.history.slice(0, MAX_HISTORY).reverse();
+                if (history.length === 0) {
+                    const row = historyBody.insertRow();
+                    const cell = row.insertCell();
+                    cell.colSpan = 4;
+                    cell.style.textAlign = 'center';
+                    cell.innerText = 'No operations recorded yet.';
+                    return;
+                }
+
+                history.forEach(entry => {
+                    const row = historyBody.insertRow();
+                    row.insertCell().innerText = new Date(entry.time).toISOString().replace('T', ' ').substring(0, 19) + ' UTC';
+                    row.insertCell().innerText = entry.action.toUpperCase().replace('_', ' ');
+
+                    const inputSample = entry.input ? entry.input.substring(0, 50) + (entry.input.length > 50 ? '...' : '') : '-';
+                    const outputSample = entry.output ? entry.output.substring(0, 50) + (entry.output.length > 50 ? '...' : '') : '-';
+
+                    row.insertCell().innerText = inputSample;
+                    row.insertCell().innerText = outputSample;
+                });
+            } else {
+                 const row = historyBody.insertRow();
+                 const cell = row.insertCell();
+                 cell.colSpan = 4;
+                 cell.style.textAlign = 'center';
+                 cell.innerText = `Error loading history: ${data.error || 'Unknown error'}`;
+            }
+        } catch (error) {
+             const historyBody = document.getElementById("history-body");
+             historyBody.innerHTML = '<tr><td colspan="4" style="text-align: center; color: var(--note-color);">Failed to connect to history service.</td></tr>';
+             console.error("History load error:", error);
+        }
+    }
+
+    // --- Button Event Listeners ---
+    document.getElementById("encode-btn").addEventListener("click",
+        ()=>callB64API('encode', document.getElementById("text-input").value.trim()));
+
+    document.getElementById("decode-btn").addEventListener("click",
+        ()=>callB64API('decode', document.getElementById("text-input").value.trim()));
+
+    document.getElementById("urlsafe-encode-btn").addEventListener("click",
+        ()=>callB64API('urlsafe_encode', document.getElementById("text-input").value.trim()));
+
+    document.getElementById("urlsafe-decode-btn").addEventListener("click",
+        ()=>callB64API('urlsafe_decode', document.getElementById("text-input").value.trim()));
+
+    document.getElementById("file-encode-btn").addEventListener("click",
+        ()=>callB64API('file_encode', undefined,
+            document.getElementById("file-input-path").value.trim(),
+            document.getElementById("file-output-path").value.trim()));
+
+    document.getElementById("file-decode-btn").addEventListener("click",
+        ()=>callB64API('file_decode', undefined,
+            document.getElementById("file-input-path").value.trim(),
+            document.getElementById("file-output-path").value.trim()));
+
+    document.addEventListener('DOMContentLoaded', () => {
+        document.getElementById("History").style.display = "none";
+        document.getElementById("FileOps").style.display = "none";
+        document.getElementById("TextOps").style.display = "block";
+        document.querySelector(".tabs button.active").click();
+    });
+</script>
+{% endblock %}
