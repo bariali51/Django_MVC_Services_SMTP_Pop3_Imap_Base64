@@ -1,8 +1,30 @@
-# PyCharm / IntelliJ
+# ========= IDE =========
 .idea/
+.vscode/
 
-# Python
+# ========= Python =========
 __pycache__/
 *.pyc
+*.pyo
+*.pyd
 venv/
+
+# ========= Environment / Secrets =========
 .env
+.env.*
+config.local.py
+local_settings.py
+
+# ========= Security =========
+*.key
+*.pem
+*.crt
+*.p12
+
+# ========= Database / Data =========
+*.sqlite3
+*.db
+
+# ========= Logs / Cache =========
+*.log
+.cache/
